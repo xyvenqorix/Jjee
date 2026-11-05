@@ -4,64 +4,113 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Xyvenqorix Emulator</title>
+<title>Xyvenqorix Universal Launcher</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#090d12;color:white;font-family:Arial}
-header{text-align:center;padding:25px}
-h1{color:#39ff88}
-main{max-width:750px;margin:auto;padding:15px}
-.panel{background:#131c25;padding:20px;border-radius:14px;margin-bottom:15px}
-select,input,button{width:100%;padding:13px;margin:8px 0;background:#0b1219;color:white;border:1px solid #344653;border-radius:9px}
-button{background:#39ff88;color:#07120c;font-weight:bold;border:0}
-#screen{height:330px;background:black;border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;color:#72818d;padding:20px}
-small{color:#91a0ae;line-height:1.6}
+body{margin:0;background:#080d12;color:#fff;font-family:Arial}
+header{text-align:center;padding:25px;border-bottom:1px solid #26333d}
+h1{color:#39ff88;margin:0}
+main{max-width:750px;margin:auto;padding:18px}
+.panel{background:#121b24;border:1px solid #283641;border-radius:15px;padding:20px;margin-bottom:16px}
+.drop{border:2px dashed #3b5966;padding:35px 15px;text-align:center;border-radius:12px;cursor:pointer}
+.drop:hover{border-color:#39ff88}
+button{width:100%;padding:14px;background:#39ff88;color:#07120c;border:0;border-radius:9px;font-weight:bold;margin-top:15px}
+#screen{background:#000;min-height:260px;border-radius:10px;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;white-space:pre-line}
+small{color:#91a1af}
 </style>
 </head>
 <body>
 <header>
-<h1>XYVENQORIX EMULATOR</h1>
-<small>Experimental Multi-System Emulator</small>
+<h1>XYVENQORIX</h1>
+<small>Universal Emulator Launcher</small>
 </header>
+
 <main>
 <div class="panel">
-<h3>Seleccionar consola</h3>
-<select id="console">
-<option value="gba">Game Boy Advance</option>
-<option value="nes">Nintendo NES</option>
-<option value="snes">Super Nintendo</option>
-<option value="gb">Game Boy</option>
-<option value="nds">Nintendo DS</option>
-<option value="psx">PlayStation 1</option>
-</select>
-<h3>Seleccionar ROM</h3>
-<input type="file" id="rom">
-<button onclick="launch()">CARGAR JUEGO</button>
+<h3>Selecciona cualquier juego</h3>
+<label class="drop">
+📁<br><br>
+Seleccionar ROM / ISO
+<input type="file" id="file" hidden>
+</label>
+<p id="filename"><small>Ningún archivo seleccionado</small></p>
+<button onclick="startGame()">ABRIR JUEGO</button>
 </div>
+
 <div class="panel">
-<h3>Pantalla del juego</h3>
-<div id="screen">Selecciona una ROM para comenzar</div>
+<h3>Información del juego</h3>
+<div id="info"><small>Esperando archivo...</small></div>
 </div>
+
 <div class="panel">
-<h3>Motor</h3>
-<small>ImLunaHey Emulators — proyecto independiente de EmulatorJS.</small>
-<p><a href="https://github.com/ImLunaHey/emulators" style="color:#39ff88">Ver proyecto original en GitHub</a></p>
+<h3>Emulador</h3>
+<div id="screen">La pantalla del juego aparecerá aquí.</div>
 </div>
 </main>
-<script>
-function launch(){
- const file=document.getElementById('rom').files[0];
- const system=document.getElementById('console').value;
- const screen=document.getElementById('screen');
 
- if(!file){
-  screen.textContent='Selecciona primero una ROM.';
+<script>
+const input=document.getElementById("file");
+let selected=null;
+
+input.addEventListener("change",()=>{
+ selected=input.files[0];
+ if(!selected)return;
+
+ document.getElementById("filename").textContent=selected.name;
+ detectGame(selected);
+});
+
+function detectGame(file){
+ const ext=file.name.split(".").pop().toLowerCase();
+
+ const systems={
+ nes:"Nintendo NES",
+ sfc:"Super Nintendo",
+ smc:"Super Nintendo",
+ gba:"Game Boy Advance",
+ gb:"Game Boy",
+ gbc:"Game Boy Color",
+ nds:"Nintendo DS",
+ iso:"Imagen de disco (posible PS2, PS3, PS4 u otro)",
+ cso:"Imagen comprimida de disco",
+ chd:"Imagen de disco CHD",
+ bin:"Archivo BIN (requiere identificar contenido)",
+ cue:"Imagen de disco CUE",
+ pbp:"PlayStation Portable / PlayStation",
+ elf:"Ejecutable de consola"
+ };
+
+ const system=systems[ext]||"Sistema desconocido";
+
+ document.getElementById("info").innerHTML=
+ "<b>Archivo:</b> "+escapeHTML(file.name)+
+ "<br><b>Tamaño:</b> "+(file.size/1048576).toFixed(2)+" MB"+
+ "<br><b>Formato:</b> "+escapeHTML(ext.toUpperCase())+
+ "<br><b>Sistema estimado:</b> "+escapeHTML(system);
+}
+
+function escapeHTML(s){
+ return s.replace(/[&<>"']/g,c=>({
+ "&":"&amp;","<":"&lt;",">":"&gt;",
+ '"':"&quot;","'":"&#39;"
+ }[c]));
+}
+
+async function startGame(){
+ if(!selected){
+  alert("Selecciona un juego primero.");
   return;
  }
 
- screen.textContent='Archivo: '+file.name+
- '\nConsola: '+system.toUpperCase()+
- '\n\nEl motor ImLunaHey WASM todavía necesita integrarse para ejecutar el juego.';
+ const screen=document.getElementById("screen");
+ const ext=selected.name.split(".").pop().toLowerCase();
+
+ screen.textContent=
+ "Juego detectado: "+selected.name+
+ "\n\nBuscando motor compatible..."+
+ "\n\nEste lanzador aún no tiene los motores de emulación integrados."+
+ "\n\nPara ejecutar PS2 se necesita PCSX2 o un motor compatible. "+
+ "Para otros sistemas se necesitan sus respectivos núcleos.";
 }
 </script>
 </body>
