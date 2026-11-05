@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Xyvenqorix Emulator</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090d12;color:white;font-family:Arial}
+header{text-align:center;padding:25px}
+h1{color:#39ff88}
+main{max-width:750px;margin:auto;padding:15px}
+.panel{background:#131c25;padding:20px;border-radius:14px;margin-bottom:15px}
+select,input,button{width:100%;padding:13px;margin:8px 0;background:#0b1219;color:white;border:1px solid #344653;border-radius:9px}
+button{background:#39ff88;color:#07120c;font-weight:bold;border:0}
+#screen{height:330px;background:black;border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;color:#72818d;padding:20px}
+small{color:#91a0ae;line-height:1.6}
+</style>
+</head>
+<body>
+<header>
+<h1>XYVENQORIX EMULATOR</h1>
+<small>Experimental Multi-System Emulator</small>
+</header>
+<main>
+<div class="panel">
+<h3>Seleccionar consola</h3>
+<select id="console">
+<option value="gba">Game Boy Advance</option>
+<option value="nes">Nintendo NES</option>
+<option value="snes">Super Nintendo</option>
+<option value="gb">Game Boy</option>
+<option value="nds">Nintendo DS</option>
+<option value="psx">PlayStation 1</option>
+</select>
+<h3>Seleccionar ROM</h3>
+<input type="file" id="rom">
+<button onclick="launch()">CARGAR JUEGO</button>
+</div>
+<div class="panel">
+<h3>Pantalla del juego</h3>
+<div id="screen">Selecciona una ROM para comenzar</div>
+</div>
+<div class="panel">
+<h3>Motor</h3>
+<small>ImLunaHey Emulators — proyecto independiente de EmulatorJS.</small>
+<p><a href="https://github.com/ImLunaHey/emulators" style="color:#39ff88">Ver proyecto original en GitHub</a></p>
+</div>
+</main>
+<script>
+function launch(){
+ const file=document.getElementById('rom').files[0];
+ const system=document.getElementById('console').value;
+ const screen=document.getElementById('screen');
+
+ if(!file){
+  screen.textContent='Selecciona primero una ROM.';
+  return;
+ }
+
+ screen.textContent='Archivo: '+file.name+
+ '\nConsola: '+system.toUpperCase()+
+ '\n\nEl motor ImLunaHey WASM todavía necesita integrarse para ejecutar el juego.';
+}
+</script>
+</body>
+</html>
